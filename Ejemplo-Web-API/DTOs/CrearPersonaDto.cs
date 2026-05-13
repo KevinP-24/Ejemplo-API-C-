@@ -12,8 +12,11 @@ namespace Ejemplo_Web_API.DTOs
         [StringLength(60)]
         public required string Apellidos { get; set; }
 
-        [Required]
-        [EmailAddress]
+        /*
+         * Nos ayuda a validar Que son campos requeridos y el EmailAdress para que sea formato de correo valido
+         */
+        [Required(ErrorMessage = "El campo del coorreo es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Formato de correo no es valido")]
         [StringLength(120)]
         public required string CorreoElectronico { get; set; }
 

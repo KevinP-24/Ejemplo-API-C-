@@ -6,8 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ejemplo_Web_API.Controllers
 {
+    /// <summary>
+    /// Controlador encargado de gestionar las operaciones CRUD de personas.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class PersonaController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -17,16 +21,29 @@ namespace Ejemplo_Web_API.Controllers
             _context = context;
         }
 
-        // GET: api/Persona
+        /// <summary>
+        /// Obtiene el listado completo de personas registradas.
+        /// </summary>
+        /// <returns>Lista de personas almacenadas en la base de datos.</returns>
+        /// <response code="200">Retorna la lista de personas.</response>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<Persona>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Persona>>> GetPersonas()
         {
-            return await _context.Personas.ToListAsync();
+            return Ok(await _context.Personas.ToListAsync());
         }
 
-        // GET: api/Persona/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Persona>> GetPersona(int id)
+        /// <summary>
+        /// Obtiene una persona específica por su identificador.
+        /// </summary>
+        /// <param name="id">Identificador único de la persona.</param>
+        /// <returns>Persona encontrada.</returns>
+        /// <response code="200">Retorna la persona encontrada.</response>
+        /// <response code="404">No se encontró una persona con el ID indicado.</response>
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(Persona), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Persona>> GetPersona([FromRoute] int id)
         {
             var person = await _context.Personas.FindAsync(id);
 
@@ -35,25 +52,28 @@ namespace Ejemplo_Web_API.Controllers
                 return NotFound();
             }
 
-            return person;
+            return Ok(person);
         }
 
-        // POST: api/Persona
+        /// <summary>
+        /// Crea una nueva persona en la base de datos.
+        /// </summary>
+        /// <param name="dto">Datos requeridos para crear una persona.</param>
+        /// <returns>Persona creada.</returns>
+        /// <response code="201">Persona creada correctamente.</response>
+        /// <response code="400">Los datos enviados no son válidos.</response>
         [HttpPost]
-        public async Task<ActionResult<Persona>> PostPersona(CrearPersonaDto dto)
+        [ProducesResponseType(typeof(Persona), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Persona>> PostPersona([FromBody] CrearPersonaDto dto)
         {
-            /*
-            if (dto.FechaNacimiento.Date > DateTime.Today)
-            {
-                return BadRequest("La fecha de nacimiento no puede ser futura.");
-            }
-            */
             var person = new Persona
             {
                 Nombres = dto.Nombres.Trim(),
                 Apellidos = dto.Apellidos.Trim(),
                 CorreoElectronico = dto.CorreoElectronico.Trim().ToLowerInvariant(),
                 Telefono = string.IsNullOrWhiteSpace(dto.Telefono) ? null : dto.Telefono.Trim(),
+
                 /*
                 Documento = dto.Documento.Trim(),
                 FechaNacimiento = dto.FechaNacimiento.Date,
@@ -62,6 +82,7 @@ namespace Ejemplo_Web_API.Controllers
                 Ciudad = string.IsNullOrWhiteSpace(dto.Ciudad) ? null : dto.Ciudad.Trim(),
                 Pais = string.IsNullOrWhiteSpace(dto.Pais) ? null : dto.Pais.Trim(),
                 */
+
                 Activo = dto.Activo
             };
 
@@ -71,17 +92,22 @@ namespace Ejemplo_Web_API.Controllers
             return CreatedAtAction(nameof(GetPersona), new { id = person.Id }, person);
         }
 
-        // PUT: api/Persona/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPersona(int id, ActualizarPersonaDto dto)
-        {   
-            /*
-            if (dto.FechaNacimiento.Date > DateTime.Today)
-            {
-                return BadRequest("La fecha de nacimiento no puede ser futura.");
-            }
-            */
-
+        /// <summary>
+        /// Actualiza los datos de una persona existente.
+        /// </summary>
+        /// <param name="id">Identificador único de la persona que se desea actualizar.</param>
+        /// <param name="dto">Datos actualizados de la persona.</param>
+        /// <response code="204">Persona actualizada correctamente.</response>
+        /// <response code="400">Los datos enviados no son válidos.</response>
+        /// <response code="404">No se encontró una persona con el ID indicado.</response>
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutPersona(
+            [FromRoute] int id,
+            [FromBody] ActualizarPersonaDto dto)
+        {
             var person = await _context.Personas.FindAsync(id);
 
             if (person == null)
@@ -93,6 +119,7 @@ namespace Ejemplo_Web_API.Controllers
             person.Apellidos = dto.Apellidos.Trim();
             person.CorreoElectronico = dto.CorreoElectronico.Trim().ToLowerInvariant();
             person.Telefono = string.IsNullOrWhiteSpace(dto.Telefono) ? null : dto.Telefono.Trim();
+
             /*
             person.Documento = dto.Documento.Trim();
             person.FechaNacimiento = dto.FechaNacimiento.Date;
@@ -101,6 +128,7 @@ namespace Ejemplo_Web_API.Controllers
             person.Ciudad = string.IsNullOrWhiteSpace(dto.Ciudad) ? null : dto.Ciudad.Trim();
             person.Pais = string.IsNullOrWhiteSpace(dto.Pais) ? null : dto.Pais.Trim();
             */
+
             person.Activo = dto.Activo;
 
             await _context.SaveChangesAsync();
@@ -108,9 +136,16 @@ namespace Ejemplo_Web_API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Persona/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePersona(int id)
+        /// <summary>
+        /// Elimina una persona de la base de datos.
+        /// </summary>
+        /// <param name="id">Identificador único de la persona que se desea eliminar.</param>
+        /// <response code="204">Persona eliminada correctamente.</response>
+        /// <response code="404">No se encontró una persona con el ID indicado.</response>
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeletePersona([FromRoute] int id)
         {
             var person = await _context.Personas.FindAsync(id);
 
