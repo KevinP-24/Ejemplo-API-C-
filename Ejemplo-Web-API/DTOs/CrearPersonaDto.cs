@@ -21,25 +21,6 @@ namespace Ejemplo_Web_API.DTOs
         [StringLength(25)]
         public string? Telefono { get; set; }
 
-        [Required]
-        [StringLength(30)]
-        public required string Documento { get; set; }
-
-        [Required]
-        public DateTime FechaNacimiento { get; set; }
-
-        [StringLength(120)]
-        public string? Ocupacion { get; set; }
-
-        [StringLength(120)]
-        public string? Direccion { get; set; }
-
-        [StringLength(80)]
-        public string? Ciudad { get; set; }
-
-        [StringLength(80)]
-        public string? Pais { get; set; }
-
         public bool Activo { get; set; } = true;
     }
 }
