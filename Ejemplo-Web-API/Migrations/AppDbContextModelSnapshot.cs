@@ -14,7 +14,7 @@ namespace Ejemplo_Web_API.Migrations
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
-            #pragma warning disable 612, 618
+#pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
@@ -28,37 +28,9 @@ namespace Ejemplo_Web_API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-                    /*
-                    b.Property<string>("Documento")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
 
-                    b.Property<DateTime>("FechaNacimiento")
-                        .HasColumnType("datetime2");
-                    
-                    b.Property<string>("Ocupacion")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("Direccion")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("Ciudad")
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<string>("Pais")
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    */
-
-                    b.Property<string>("Nombres")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)");
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Apellidos")
                         .IsRequired()
@@ -70,19 +42,20 @@ namespace Ejemplo_Web_API.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<string>("Nombres")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
 
                     b.Property<string>("Telefono")
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.ToTable("Personas");
                 });
-        #pragma warning restore 612, 618
+#pragma warning restore 612, 618
         }
     }
 }
